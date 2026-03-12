@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} | DNA Classification System{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'history' %}">History</a></li>
+            <li class="breadcrumb-item active">Result #{{ record.pk }}</li>
+        </ol>
+    </nav>
+
+    <!-- Result Header -->
+    <div class="result-header glass-card mb-4 p-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-3 mb-2">
+                    <span class="fs-2">🧬</span>
+                    <div>
+                        <h1 class="result-prediction">{{ record.prediction }}</h1>
+                        <div class="text-muted small">Classified on {{ record.created_at|date:"F d, Y \a\t H:i" }} UTC</div>
+                    </div>
+                </div>
+                <div class="confidence-row mt-3">
+                    <span class="me-3 text-muted">Confidence:</span>
+                    <div class="confidence-bar-lg">
+                        <div class="confidence-fill bg-{{ record.confidence_color }}"
+                             style="width:{{ record.confidence_score|floatformat:2 }}00%"
+                             title="{{ record.confidence_percent }}">
+                        </div>
+                    </div>
+                    <span class="ms-3 fw-bold text-{{ record.confidence_color }}">{{ record.confidence_percent }}</span>
+                </div>
+                {% if prob_labels and prob_labels != '[]' %}
+                <div class="mt-3">
+                    <small class="text-muted d-block mb-2">Class Probability Breakdown:</small>
+                    <div style="height:80px">
+                        <canvas id="probChart"></canvas>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <a href="{% url 'export_pdf' record.pk %}" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-file-pdf me-2"></i>Export PDF
+                </a>
+                <a href="{% url 'dna_input' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>New Analysis
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column -->
+        <div class="col-lg-7">
+
+            <!-- Sequence Stats -->
+            <div class="glass-card p-4 mb-4">
+                <h3 class="section-card-title"><i class="bi bi-bar-chart me-2 text-primary"></i>Sequence Statistics</h3>
+                <div class="row g-3 mt-1">
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat text-center">
+                            <div class="mini-stat-val">{{ stats.length|default:0 }}</div>
+                            <div class="mini-stat-label">Length (bp)</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat text-center">
+                            <div class="mini-stat-val text-info">{{ stats.gc_content|default:0 }}%</div>
+                            <div class="mini-stat-label">GC Content</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat text-center">
+                            <div class="mini-stat-val text-warning">{{ stats.at_content|default:0 }}%</div>
+                            <div class="mini-stat-label">AT Content</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="mini-stat text-center">
+                            <div class="mini-stat-val text-success">{{ record.confidence_percent }}</div>
+                            <div class="mini-stat-label">Confidence</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Base Breakdown -->
+                {% if stats.percentages %}
+                <div class="base-breakdown mt-4">
+                    {% for base, pct in stats.percentages.items %}
+                    <div class="base-row">
+                        <span class="base-label base-{{ base }}">{{ base }}</span>
+                        <div class="base-track">
+                            <div class="base-fill base-fill-{{ base }}" style="width:{{ pct }}%"></div>
+                        </div>
+                        <span class="base-pct">{{ pct }}%</span>
+                        <span class="base-count text-muted">({{ stats.counts|default:'' }})</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- DNA Sequence Display -->
+            <div class="glass-card p-4 mb-4">
+                <h3 class="section-card-title"><i class="bi bi-code-square me-2 text-success"></i>DNA Sequence</h3>
+                <div class="sequence-display mt-3">
+                    {{ colored_sequence|safe }}
+                    {% if record.sequence|length > 300 %}
+                    <span class="text-muted">... ({{ record.sequence|length }} bp total)</span>
+                    {% endif %}
+                </div>
+                <div class="sequence-legend mt-3">
+                    <span class="legend-item"><span class="dot" style="background:#22c55e"></span>Adenine (A)</span>
+                    <span class="legend-item"><span class="dot" style="background:#ef4444"></span>Thymine (T)</span>
+                    <span class="legend-item"><span class="dot" style="background:#3b82f6"></span>Guanine (G)</span>
+                    <span class="legend-item"><span class="dot" style="background:#f59e0b"></span>Cytosine (C)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - AI Content -->
+        <div class="col-lg-5">
+
+            <!-- AI Explanation -->
+            <div class="glass-card p-4 mb-4 ai-card">
+                <div class="ai-header mb-3">
+                    <i class="bi bi-stars text-warning me-2"></i>
+                    <span class="ai-badge">GPT-4o Explanation</span>
+                </div>
+                <div class="ai-content markdown-content">
+                    {% if record.ai_explanation %}
+                        {{ record.ai_explanation|linebreaks }}
+                    {% else %}
+                        <p class="text-muted">AI explanation not available for this record.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- AI Suggestions -->
+            <div class="glass-card p-4 ai-card ai-suggestions-card">
+                <div class="ai-header mb-3">
+                    <i class="bi bi-lightbulb text-info me-2"></i>
+                    <span class="ai-badge suggestions">Research Suggestions</span>
+                </div>
+                <div class="ai-content markdown-content">
+                    {% if record.ai_suggestions %}
+                        {{ record.ai_suggestions|linebreaks }}
+                    {% else %}
+                        <p class="text-muted">AI suggestions not available for this record.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if prob_labels and prob_labels != '[]' %}
+<script>
+(function() {
+    const labels = {{ prob_labels|safe }};
+    const values = {{ prob_values|safe }};
+    const colors = labels.map(l => {
+        if (l.toLowerCase().includes('human')) return 'rgba(34,197,94,0.8)';
+        if (l.toLowerCase().includes('chimp')) return 'rgba(251,146,60,0.8)';
+        if (l.toLowerCase().includes('dog')) return 'rgba(59,130,246,0.8)';
+        return 'rgba(139,92,246,0.8)';
+    });
+    const ctx = document.getElementById('probChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        min: 0, max: 100,
+                        ticks: { color: '#64748b', callback: v => v + '%' },
+                        grid: { color: 'rgba(255,255,255,0.05)' }
+                    },
+                    y: { ticks: { color: '#94a3b8', font: { weight: '600' } }, grid: { display: false } }
+                }
+            }
+        });
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

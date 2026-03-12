@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% block title %}Classify DNA | DNA Classification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-8">
+            <!-- Page Header -->
+            <div class="text-center mb-5">
+                <div class="page-icon-large mb-3">🧬</div>
+                <h1 class="page-title">DNA Sequence <span class="gradient-text">Classification</span></h1>
+                <p class="text-muted">Enter your DNA sequence below. Only A, T, G, C characters are accepted.</p>
+            </div>
+
+            <!-- Input Card -->
+            <div class="glass-card p-4 p-lg-5">
+                <form method="post" id="dnaForm">
+                    {% csrf_token %}
+
+                    <!-- Sequence Rules -->
+                    <div class="rules-card mb-4">
+                        <div class="rules-header"><i class="bi bi-shield-check me-2 text-success"></i>Sequence Rules & Model Info</div>
+                        <div class="rules-body">
+                            <span class="rule-tag"><i class="bi bi-check2 me-1"></i>Only A, T, G, C</span>
+                            <span class="rule-tag"><i class="bi bi-check2 me-1"></i>Min 10 characters</span>
+                            <span class="rule-tag"><i class="bi bi-check2 me-1"></i>Max 5000 characters</span>
+                            <span class="rule-tag"><i class="bi bi-check2 me-1"></i>Case insensitive</span>
+                            <span class="rule-tag" style="background:rgba(139,92,246,0.1);color:#8b5cf6;border-color:rgba(139,92,246,0.2)"><i class="bi bi-info-circle me-1"></i>Predicts: Human / Chimpanzee / Dog (species classification)</span>
+                        </div>
+                    </div>
+
+                    <!-- Textarea -->
+                    <div class="mb-4">
+                        <label for="sequence" class="form-label fw-semibold">DNA Sequence</label>
+                        <textarea
+                            class="form-control dna-textarea font-mono"
+                            id="sequence"
+                            name="sequence"
+                            rows="8"
+                            placeholder="Enter DNA sequence here...&#10;&#10;Example:&#10;ACACAAGTCTCCCTTCCCCAATTTTGCCATCCTCATCGAGTCCCCGGGGCAGGTCCCGAT"
+                            maxlength="5000"
+                        >{{ sequence }}</textarea>
+
+                        <!-- Char counter & validation indicator -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div id="validationIndicator" class="validation-status"></div>
+                            <small class="text-muted">
+                                <span id="charCount">0</span>/5000 characters
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Base Composition Preview -->
+                    <div class="base-composition mb-4" id="baseComposition" style="display:none">
+                        <div class="bc-title">Base Composition</div>
+                        <div class="bc-bars">
+                            <div class="bc-bar-item">
+                                <div class="bc-label" style="color:#22c55e">A</div>
+                                <div class="bc-bar-track"><div class="bc-bar-fill" id="barA" style="background:#22c55e"></div></div>
+                                <div class="bc-pct" id="pctA">0%</div>
+                            </div>
+                            <div class="bc-bar-item">
+                                <div class="bc-label" style="color:#ef4444">T</div>
+                                <div class="bc-bar-track"><div class="bc-bar-fill" id="barT" style="background:#ef4444"></div></div>
+                                <div class="bc-pct" id="pctT">0%</div>
+                            </div>
+                            <div class="bc-bar-item">
+                                <div class="bc-label" style="color:#3b82f6">G</div>
+                                <div class="bc-bar-track"><div class="bc-bar-fill" id="barG" style="background:#3b82f6"></div></div>
+                                <div class="bc-pct" id="pctG">0%</div>
+                            </div>
+                            <div class="bc-bar-item">
+                                <div class="bc-label" style="color:#f59e0b">C</div>
+                                <div class="bc-bar-track"><div class="bc-bar-fill" id="barC" style="background:#f59e0b"></div></div>
+                                <div class="bc-pct" id="pctC">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Example Sequences -->
+                    <div class="mb-4">
+                        <div class="example-label">Quick Examples (real genomic sequences):</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-success example-btn"
+                                title="Human BRCA2 gene fragment"
+                                data-seq="ATGCCTATTGGATCCAAAGAGAGGCCAACATTTTTTGAAATTTTTAAGAACGCCACTCAAAAATGTTTTAATTGACAAAGAAAACAATGCAGACAATACGAGCCACAGCCCTAAAGAAATATTCAAAGAGCAGCAATCAGCTGGGAGCAGCAGCAGCAGCAACAACAGCAACAGCAGCAGCAGCAGCAACAGCAGCGGGAGTAGATGAAGATGATGAAGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGATGAT">
+                                🧬 Human (BRCA2)
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-warning example-btn"
+                                title="Chimpanzee chromosome 22 fragment"
+                                data-seq="TTTAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATAAATA">
+                                🐒 Chimpanzee
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-info example-btn"
+                                title="Dog (Canis lupus) genomic fragment"
+                                data-seq="ATGGCAGCTGCAGCAGCAGCAGCAGCAGCAGCAGCTGCAGCTGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG">
+                                🐕 Dog
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger" id="clearBtn">
+                                <i class="bi bi-x-circle me-1"></i>Clear
+                            </button>
+                        </div>
+                        <small class="text-muted mt-1 d-block">
+                            <i class="bi bi-info-circle me-1"></i>
+                            This model classifies DNA sequences by species origin (Human / Chimpanzee / Dog). Use sequences of 200+ bp for best accuracy.
+                        </small>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100" id="submitBtn">
+                        <span id="btnDefault">
+                            <i class="bi bi-cpu me-2"></i>Classify with AI
+                        </span>
+                        <span id="btnLoading" style="display:none">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Analyzing sequence... This may take a moment
+                        </span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="row g-3 mt-4">
+                <div class="col-md-4">
+                    <div class="info-card glass-card text-center p-3">
+                        <div class="info-icon">⚡</div>
+                        <div class="info-text">Instant ML prediction using trained genomic models</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card glass-card text-center p-3">
+                        <div class="info-icon">🤖</div>
+                        <div class="info-text">GPT-4o explains your result with biological context</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="info-card glass-card text-center p-3">
+                        <div class="info-icon">💾</div>
+                        <div class="info-text">Results saved to your history automatically</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('sequence');
+    const charCount = document.getElementById('charCount');
+    const validationIndicator = document.getElementById('validationIndicator');
+    const baseComposition = document.getElementById('baseComposition');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updateStats() {
+        const val = textarea.value.replace(/\s/g, '').toUpperCase();
+        charCount.textContent = val.length;
+
+        if (val.length === 0) {
+            validationIndicator.innerHTML = '';
+            baseComposition.style.display = 'none';
+            return;
+        }
+
+        // Validate
+        const invalid = [...val].filter(c => !'ATGC'.includes(c));
+        if (invalid.length > 0) {
+            validationIndicator.innerHTML = `<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Invalid chars: ${[...new Set(invalid)].join(', ')}</span>`;
+        } else if (val.length < 10) {
+            validationIndicator.innerHTML = `<span class="text-warning"><i class="bi bi-exclamation-circle me-1"></i>Too short (min 10)</span>`;
+        } else {
+            validationIndicator.innerHTML = `<span class="text-success"><i class="bi bi-check-circle me-1"></i>Valid sequence</span>`;
+        }
+
+        // Base composition
+        if (val.length >= 4) {
+            baseComposition.style.display = 'block';
+            ['A','T','G','C'].forEach(base => {
+                const count = (val.match(new RegExp(base, 'g')) || []).length;
+                const pct = Math.round(count / val.length * 100);
+                document.getElementById('bar' + base).style.width = pct + '%';
+                document.getElementById('pct' + base).textContent = pct + '%';
+            });
+        }
+    }
+
+    textarea.addEventListener('input', updateStats);
+    updateStats();
+
+    // Example sequences
+    document.querySelectorAll('.example-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            textarea.value = btn.dataset.seq;
+            updateStats();
+            textarea.focus();
+        });
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        textarea.value = '';
+        updateStats();
+    });
+
+    // Loading state on submit
+    document.getElementById('dnaForm').addEventListener('submit', function(e) {
+        const val = textarea.value.replace(/\s/g, '').toUpperCase();
+        if (val.length < 10) return;
+        document.getElementById('btnDefault').style.display = 'none';
+        document.getElementById('btnLoading').style.display = 'inline-flex';
+        submitBtn.disabled = true;
+    });
+});
+</script>
+{% endblock %}

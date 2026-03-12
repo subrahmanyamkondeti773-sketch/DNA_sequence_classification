@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | DNA Classification System{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+    <!-- Page Header -->
+    <div class="page-header d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="page-title">Welcome back, <span class="gradient-text">{{ user.username }}</span> 👋</h1>
+            <p class="text-muted">Here's your DNA analysis overview</p>
+        </div>
+        <a href="{% url 'dna_input' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>New Classification
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="stat-card-value">{{ total_predictions }}</div>
+                <div class="stat-card-label">Total Classifications</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#22c55e,#15803d)">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-card-value">{{ today_predictions }}</div>
+                <div class="stat-card-label">Today's Analyses</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <div class="stat-card-value">GPT-4o</div>
+                <div class="stat-card-label">AI Model</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div class="stat-card-value">
+                    {% if recent_predictions %}
+                    {{ recent_predictions.0.created_at|timesince|truncatewords:2 }}
+                    {% else %}Never{% endif %}
+                </div>
+                <div class="stat-card-label">Last Analysis</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="glass-card h-100 p-4">
+                <h3 class="chart-title mb-4"><i class="bi bi-pie-chart me-2 text-primary"></i>Classification Distribution</h3>
+                {% if total_predictions > 0 %}
+                <div class="chart-container">
+                    <canvas id="classPieChart"></canvas>
+                </div>
+                {% else %}
+                <div class="empty-chart d-flex flex-column align-items-center justify-content-center h-100">
+                    <i class="bi bi-bar-chart-line fs-1 text-muted mb-3"></i>
+                    <p class="text-muted">No predictions yet. <a href="{% url 'dna_input' %}">Classify your first sequence!</a></p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="glass-card h-100 p-4">
+                <h3 class="chart-title mb-4"><i class="bi bi-graph-up me-2 text-success"></i>Activity (Last 7 Days)</h3>
+                <div class="chart-container">
+                    <canvas id="activityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Predictions -->
+    <div class="glass-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="chart-title mb-0"><i class="bi bi-list-ul me-2 text-info"></i>Recent Predictions</h3>
+            <a href="{% url 'history' %}" class="btn btn-outline-primary btn-sm">View All</a>
+        </div>
+        {% if recent_predictions %}
+        <div class="table-responsive">
+            <table class="table table-hover glass-table align-middle">
+                <thead>
+                    <tr>
+                        <th>Sequence Preview</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pred in recent_predictions %}
+                    <tr>
+                        <td><code class="seq-preview">{{ pred.short_sequence }}</code></td>
+                        <td><span class="badge prediction-badge">{{ pred.prediction }}</span></td>
+                        <td>
+                            <div class="confidence-mini">
+                                <div class="confidence-mini-bar bg-{{ pred.confidence_color }}" style="width:{{ pred.confidence_score|floatformat:2|stringformat:'s' }}%"></div>
+                            </div>
+                            <small class="text-{{ pred.confidence_color }}">{{ pred.confidence_percent }}</small>
+                        </td>
+                        <td><small class="text-muted">{{ pred.created_at|date:"M d, Y" }}</small></td>
+                        <td>
+                            <a href="{% url 'result' pred.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div class="fs-1 mb-3">🧬</div>
+            <h4>No predictions yet</h4>
+            <p class="text-muted">Start classifying DNA sequences to see your history here.</p>
+            <a href="{% url 'dna_input' %}" class="btn btn-primary">
+                <i class="bi bi-search me-2"></i>Classify Now
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const chartLabels = {{ chart_labels|safe }};
+const chartValues = {{ chart_values|safe }};
+const last7Days = {{ last_7_days|safe }};
+
+// Pie Chart
+if (chartLabels.length > 0) {
+    const ctx1 = document.getElementById('classPieChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            labels: chartLabels,
+            datasets: [{
+                data: chartValues,
+                backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'],
+                borderWidth: 2,
+                borderColor: 'rgba(255,255,255,0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } }
+            }
+        }
+    });
+}
+
+// Activity Chart
+const ctx2 = document.getElementById('activityChart').getContext('2d');
+new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: last7Days.map(d => d.date),
+        datasets: [{
+            label: 'Classifications',
+            data: last7Days.map(d => d.count),
+            backgroundColor: 'rgba(59,130,246,0.7)',
+            borderColor: '#3b82f6',
+            borderWidth: 1,
+            borderRadius: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { color: '#94a3b8', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+        }
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Register | DNA Classification System{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="auth-card glass-card p-4 p-lg-5">
+                <div class="text-center mb-4">
+                    <div class="auth-icon mb-3">🧬</div>
+                    <h2 class="auth-title">Create Account</h2>
+                    <p class="text-muted">Join the DNA Classification System</p>
+                </div>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% crispy form %}
+                </form>
+                <div class="text-center mt-3">
+                    <p class="text-muted mb-0">Already have an account?
+                        <a href="{% url 'login' %}" class="text-primary fw-semibold">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

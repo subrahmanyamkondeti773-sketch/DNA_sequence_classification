@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block title %}Admin Analytics | DNA Classification System{% endblock %}
+
+{% block content %}
+<div class="container-xl py-5">
+    <div class="d-flex align-items-center gap-3 mb-5">
+        <div class="fs-2">🛡️</div>
+        <div>
+            <h1 class="page-title">Admin <span class="gradient-text">Analytics Dashboard</span></h1>
+            <p class="text-muted">System-wide monitoring and analytics</p>
+        </div>
+        <a href="{% url 'admin:index' %}" class="btn btn-outline-warning ms-auto">
+            <i class="bi bi-gear me-2"></i>Django Admin Panel
+        </a>
+    </div>
+
+    <!-- System Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-card-value">{{ total_users }}</div>
+                <div class="stat-card-label">Total Users</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#22c55e,#15803d)">
+                    <i class="bi bi-search"></i>
+                </div>
+                <div class="stat-card-value">{{ total_predictions }}</div>
+                <div class="stat-card-label">Total Predictions</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
+                    <i class="bi bi-calendar-day"></i>
+                </div>
+                <div class="stat-card-value">{{ today_predictions }}</div>
+                <div class="stat-card-label">Today's Predictions</div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xl-3">
+            <div class="stat-card glass-card h-100">
+                <div class="stat-card-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
+                    <i class="bi bi-person-check"></i>
+                </div>
+                <div class="stat-card-value">{{ active_users }}</div>
+                <div class="stat-card-label">Active Users (7d)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Class Distribution Chart -->
+        <div class="col-lg-5">
+            <div class="glass-card p-4 h-100">
+                <h3 class="chart-title mb-4"><i class="bi bi-pie-chart me-2 text-primary"></i>Global Class Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="adminPieChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Predictions Table -->
+        <div class="col-lg-7">
+            <div class="glass-card p-4 h-100">
+                <h3 class="chart-title mb-4"><i class="bi bi-list-check me-2 text-success"></i>Recent Predictions</h3>
+                <div class="table-responsive">
+                    <table class="table table-sm glass-table align-middle">
+                        <thead>
+                            <tr><th>User</th><th>Prediction</th><th>Confidence</th><th>Date</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in recent_predictions %}
+                            <tr>
+                                <td><span class="fw-semibold">{{ pred.user.username }}</span></td>
+                                <td><span class="badge prediction-badge">{{ pred.prediction }}</span></td>
+                                <td><small class="text-{{ pred.confidence_color }}">{{ pred.confidence_percent }}</small></td>
+                                <td><small class="text-muted">{{ pred.created_at|date:"M d H:i" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Logs -->
+    <div class="glass-card p-4">
+        <h3 class="chart-title mb-4"><i class="bi bi-terminal me-2 text-warning"></i>API Logs</h3>
+        {% if api_logs %}
+        <div class="table-responsive">
+            <table class="table table-sm glass-table align-middle">
+                <thead>
+                    <tr><th>Endpoint</th><th>Status</th><th>Response Time</th><th>Date</th><th>Error</th></tr>
+                </thead>
+                <tbody>
+                    {% for log in api_logs %}
+                    <tr>
+                        <td><code>{{ log.endpoint }}</code></td>
+                        <td>
+                            <span class="badge bg-{% if log.status == 'success' %}success{% elif log.status == 'error' %}danger{% else %}warning{% endif %}">
+                                {{ log.status }}
+                            </span>
+                        </td>
+                        <td><small>{{ log.response_time|floatformat:2 }}s</small></td>
+                        <td><small class="text-muted">{{ log.created_at|date:"M d H:i" }}</small></td>
+                        <td><small class="text-danger">{{ log.error_message|truncatechars:40 }}</small></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center py-3">No API logs yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const classDistData = {{ class_dist|safe }};
+if (classDistData.length > 0) {
+    const ctx = document.getElementById('adminPieChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: classDistData.map(d => d.prediction),
+            datasets: [{
+                data: classDistData.map(d => d.count),
+                backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'],
+                borderWidth: 2,
+                borderColor: 'rgba(255,255,255,0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } }
+        }
+    });
+}
+</script>
+{% endblock %}

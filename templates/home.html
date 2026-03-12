@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% block title %}Home | DNA Classification System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <!-- DNA Helix Animation Background -->
+    <div class="dna-helix-container" aria-hidden="true">
+        <div class="dna-helix">
+            {% for i in "12345678" %}
+            <div class="dna-strand strand-left delay-{{ forloop.counter }}"></div>
+            <div class="dna-rung rung-{{ forloop.counter }}"></div>
+            <div class="dna-strand strand-right delay-{{ forloop.counter }}"></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="container-xl position-relative py-5">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 hero-content">
+                <div class="badge-pill mb-4">
+                    <span class="pulse-dot"></span>
+                </div>
+                <h1 class="hero-title">
+                     DNA<br>
+                    <span class="gradient-text">Sequences classification</span><br>
+                    using machine learning
+                </h1>
+                <p class="hero-subtitle">
+                    Upload any DNA sequence and get instant classification using trained machine learning models,
+                    enriched with GPT-4 powered biological explanations and research insights.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'dna_input' %}" class="btn btn-primary btn-hero">
+                        <i class="bi bi-search me-2"></i>Classify DNA Now
+                    </a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-hero-outline">
+                        <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                    </a>
+                    {% else %}
+                    <a href="{% url 'register' %}" class="btn btn-primary btn-hero">
+                        <i class="bi bi-person-plus me-2"></i>Get Started Free
+                    </a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-light btn-hero-outline">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Stats Row -->
+                <div class="hero-stats mt-5">
+                    <div class="stat-item">
+                        <div class="stat-number">{{ stats.total_predictions|default:0 }}</div>
+                        <div class="stat-label">Classifications</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ stats.total_users|default:0 }}</div>
+                        <div class="stat-label">Researchers</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number">GPT-4o</div>
+                        <div class="stat-label">AI Model</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DNA Visualization Card -->
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                <div class="hero-card glass-card">
+                    <div class="hero-card-header">
+                        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                        <span class="ms-2 text-muted small">DNA Analysis</span>
+                    </div>
+                    <div class="demo-sequence">
+                        <span class="base-A">A</span><span class="base-C">C</span><span class="base-A">A</span><span class="base-C">C</span><span class="base-A">A</span><span class="base-A">A</span><span class="base-G">G</span><span class="base-T">T</span><span class="base-C">C</span><span class="base-T">T</span><span class="base-C">C</span><span class="base-C">C</span>
+                    </div>
+                    <div class="demo-result mt-3">
+                        <div class="result-label">Predicted Class</div>
+                        <div class="result-badge">Gene Promoter Region</div>
+                        <div class="confidence-bar-demo mt-2">
+                            <div class="confidence-fill" style="width:87%"></div>
+                        </div>
+                        <div class="confidence-text">87.3% Confidence</div>
+                    </div>
+                    <div class="demo-ai-tag mt-3">
+                        <i class="bi bi-stars me-1 text-warning"></i>
+                        <small>AI Explanation Available</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section py-6">
+    <div class="container-xl">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Everything you need for professional DNA sequence analysis</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🧬</div>
+                    <h3 class="feature-title">ML Classification</h3>
+                    <p class="feature-desc">Advanced machine learning models trained on genomic datasets classify your DNA sequences instantly with high accuracy.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">🤖</div>
+                    <h3 class="feature-title">AI Explanation</h3>
+                    <p class="feature-desc">GPT-4o powered explanations provide biological context, gene type identification, and health relevance for every classification.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #22c55e, #15803d);">📊</div>
+                    <h3 class="feature-title">Analytics Dashboard</h3>
+                    <p class="feature-desc">Interactive Chart.js visualizations showing your classification history, class distribution, and activity trends.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #f59e0b, #b45309);">🔬</div>
+                    <h3 class="feature-title">Sequence Visualization</h3>
+                    <p class="feature-desc">Color-coded base display (A/T/G/C) with GC content analysis and sequence statistics for each prediction.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">📄</div>
+                    <h3 class="feature-title">PDF Export</h3>
+                    <p class="feature-desc">Download complete analysis reports as professional PDF documents including sequence data, classification, and AI insights.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="feature-card glass-card h-100">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #06b6d4, #0e7490);">🏥</div>
+                    <h3 class="feature-title">Research History</h3>
+                    <p class="feature-desc">Full searchable history of all your classifications with pagination, filters, and detailed view for each prediction.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section py-6">
+    <div class="container-xl text-center">
+        <div class="cta-card glass-card mx-auto">
+            <div class="fs-1 mb-3">🧬</div>
+            <h2 class="cta-title">Ready to Analyze Your DNA Sequence?</h2>
+            <p class="cta-subtitle">Join researchers worldwide using AI-powered genomics classification.</p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'dna_input' %}" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-search me-2"></i>Start Classification
+            </a>
+            {% else %}
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-5">
+                <i class="bi bi-person-plus me-2"></i>Create Free Account
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
