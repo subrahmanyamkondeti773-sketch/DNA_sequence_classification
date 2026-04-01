@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<style>
+    body {
+        background: linear-gradient(135deg, 
+                    rgba(10, 15, 30, 0.95) 0%, 
+                    rgba(15, 23, 42, 0.92) 50%, 
+                    rgba(20, 10, 30, 0.95) 100%), 
+                    url('{% static "images/dna_bg.png" %}') !important;
+        background-attachment: fixed !important;
+        background-size: cover !important;
+        background-position: center !important;
+        color: #e2e8f0 !important;
+    }
+    #header {
+        background: rgba(10, 15, 30, 0.8) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    #branding h1 {
+        color: #3b82f6 !important;
+    }
+    #content {
+        background: transparent !important;
+    }
+    .module h2, .module caption, .inline-group h2 {
+        background: rgba(59, 130, 246, 0.8) !important;
+    }
+    div.breadcrumbs {
+        background: rgba(15, 23, 42, 0.9) !important;
+        border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    }
+    a:link, a:visited {
+        color: #3b82f6 !important;
+    }
+    .module th, .module td {
+        background: rgba(255, 255, 255, 0.02) !important;
+        color: #e2e8f0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        🧬 DNA Team Administration
+    </a>
+</h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}

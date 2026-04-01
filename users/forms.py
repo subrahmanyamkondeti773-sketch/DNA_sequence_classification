@@ -15,18 +15,14 @@ class RegisterForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(attrs={'placeholder': 'Enter your email'})
     )
-    first_name = forms.CharField(
-        max_length=50, required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'First name (optional)'})
-    )
-    last_name = forms.CharField(
-        max_length=50, required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Last name (optional)'})
+    team_name = forms.CharField(
+        max_length=100, required=False,
+        widget=forms.TextInput(attrs={'placeholder': 'Team Name (e.g., Team Alpha)'})
     )
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'email', 'password1', 'password2']
+        fields = ['username', 'first_name', 'last_name', 'email', 'team_name', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -34,7 +30,7 @@ class RegisterForm(UserCreationForm):
         self.helper.form_method = 'post'
         self.helper.layout = Layout(
             Row(Column('first_name', css_class='col-md-6'), Column('last_name', css_class='col-md-6')),
-            'username', 'email', 'password1', 'password2',
+            'username', 'email', 'team_name', 'password1', 'password2',
             Submit('submit', 'Create Account', css_class='btn btn-primary btn-lg w-100 mt-3')
         )
         for field_name, field in self.fields.items():
@@ -53,7 +49,10 @@ class RegisterForm(UserCreationForm):
         user.last_name = self.cleaned_data.get('last_name', '')
         if commit:
             user.save()
-            UserProfile.objects.create(user=user)
+            UserProfile.objects.create(
+                user=user,
+                team_name=self.cleaned_data.get('team_name', '')
+            )
         return user
 
 
@@ -77,9 +76,11 @@ class ProfileForm(forms.ModelForm):
     last_name = forms.CharField(max_length=50, required=False)
     email = forms.EmailField(required=False)
 
+    team_name = forms.CharField(max_length=100, required=False)
+
     class Meta:
         model = UserProfile
-        fields = ['bio', 'avatar']
+        fields = ['team_name', 'bio', 'avatar']
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tell us about yourself...'}),
         }

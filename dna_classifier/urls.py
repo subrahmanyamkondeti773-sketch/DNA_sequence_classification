@@ -14,4 +14,5 @@ urlpatterns = [
     path('dna/export/<int:pk>/', views.export_pdf_view, name='export_pdf'),
     path('api/analytics/', views.analytics_api_view, name='analytics_api'),
     path('admin-dashboard/', views.admin_dashboard_view, name='admin_dashboard'),
+    path('dna/accuracy-report/', views.model_accuracy_view, name='model_accuracy'),
 ]

@@ -1,0 +1,111 @@
+{% extends "admin/login.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<style>
+    body {
+        background: linear-gradient(135deg, 
+                    rgba(10, 15, 30, 0.95) 0%, 
+                    rgba(15, 23, 42, 0.92) 50%, 
+                    rgba(20, 10, 30, 0.95) 100%), 
+                    url('{% static "images/dna_bg.png" %}') !important;
+        background-attachment: fixed !important;
+        background-size: cover !important;
+        background-position: center !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+    }
+    #container {
+        background: rgba(255, 255, 255, 0.05) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3) !important;
+        width: 100% !important;
+        max-width: 400px !important;
+        margin: 0 !important;
+        padding: 2rem !important;
+    }
+    #header {
+        background: transparent !important;
+        color: white !important;
+        text-align: center !important;
+        padding: 0 0 1.5rem 0 !important;
+    }
+    #header h1 {
+        font-size: 1.5rem !important;
+        font-weight: 800 !important;
+        margin: 0 !important;
+    }
+    #header h1 a {
+        color: white !important;
+        text-decoration: none !important;
+    }
+    .login .form-row {
+        background: transparent !important;
+        border: none !important;
+        padding: 10px 0 !important;
+    }
+    .login label {
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+        margin-bottom: 5px !important;
+    }
+    .login input[type="text"], .login input[type="password"] {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 10px !important;
+        width: 100% !important;
+    }
+    .submit-row {
+        background: transparent !important;
+        border: none !important;
+        padding: 20px 0 0 0 !important;
+    }
+    .submit-row input {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 12px !important;
+        font-weight: 700 !important;
+        width: 100% !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+    .submit-row input:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4) !important;
+    }
+    .dna-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        display: block;
+        animation: rotateDNA 20s linear infinite;
+    }
+    @keyframes rotateDNA {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    #content-main {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <div class="text-center mb-4">
+        <span class="dna-icon text-center">🧬</span>
+    </div>
+    {{ block.super }}
+</div>
+{% endblock %}

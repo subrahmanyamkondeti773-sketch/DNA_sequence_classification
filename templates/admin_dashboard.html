@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
+{% block body_class %}dna-admin-bg{% endblock %}
 {% block title %}Admin Analytics | DNA Classification System{% endblock %}
 
 {% block content %}
+<div class="dna-helix-bg"></div>
 <div class="container-xl py-5">
     <div class="d-flex align-items-center gap-3 mb-5">
-        <div class="fs-2">🛡️</div>
+        <div class="admin-brand-icon">🧬</div>
         <div>
-            <h1 class="page-title">Admin <span class="gradient-text">Analytics Dashboard</span></h1>
-            <p class="text-muted">System-wide monitoring and analytics</p>
+            <div class="admin-header-badge mb-1">DNA Team System</div>
+            <h1 class="page-title">Administrative <span class="gradient-text">Analytics Dashboard</span></h1>
+            <p class="text-muted">Global monitoring and DNA sequence classification analytics</p>
         </div>
-        <a href="{% url 'admin:index' %}" class="btn btn-outline-warning ms-auto">
-            <i class="bi bi-gear me-2"></i>Django Admin Panel
+        <a href="{% url 'admin:index' %}" class="btn btn-admin ms-auto">
+            <i class="bi bi-gear-fill"></i> DNA Management
         </a>
     </div>
 

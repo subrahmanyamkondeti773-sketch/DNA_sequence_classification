@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     """Extended profile linked to Django's built-in User model."""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    team_name = models.CharField(max_length=100, blank=True, default='', help_text="Identify your team (e.g., Team Alpha)")
     bio = models.TextField(max_length=500, blank=True, default='')
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

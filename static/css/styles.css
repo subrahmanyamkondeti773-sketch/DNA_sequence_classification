@@ -10,8 +10,10 @@
     --success: #22c55e;
     --warning: #f59e0b;
     --danger: #ef4444;
-    --purple: #8b5cf6;
-    --cyan: #06b6d4;
+    --purple: #a855f7;
+    --cyan: #22d3ee;
+    --pink: #f472b6;
+    --orange: #fb923c;
 
     --bg-dark: #0a0f1e;
     --bg-card-dark: rgba(255, 255, 255, 0.05);
@@ -48,6 +50,27 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    /* Colorful DNA Background for all pages */
+    background: linear-gradient(135deg, 
+                rgba(10, 15, 30, 0.95) 0%, 
+                rgba(15, 23, 42, 0.92) 50%, 
+                rgba(20, 10, 30, 0.95) 100%), 
+                url('../images/dna_bg.png');
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: -1;
 }
 main.main-content { flex: 1; }
 .font-mono { font-family: var(--font-mono) !important; }
@@ -125,12 +148,27 @@ main.main-content { flex: 1; }
 /* --- Hero Section --- */
 .hero-section {
     position: relative;
-    background: linear-gradient(135deg, #0a0f1e 0%, #0f172a 50%, #0d1b35 100%);
+    /* Vibrant Colorful Gradient for Hero */
+    background: linear-gradient(135deg, 
+                rgba(59, 130, 246, 0.3) 0%, 
+                rgba(139, 92, 246, 0.3) 33%, 
+                rgba(244, 114, 182, 0.2) 66%,
+                rgba(6, 182, 212, 0.3) 100%), 
+                url('../images/dna_bg.png');
+    background-size: cover;
+    background-position: center;
     overflow: hidden;
-    padding: 2rem 0;
+    padding: 4rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 [data-bs-theme="light"] .hero-section {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #e0f2fe 100%);
+    background: linear-gradient(135deg, 
+                rgba(219, 234, 254, 0.9) 0%, 
+                rgba(237, 233, 254, 0.9) 50%, 
+                rgba(207, 250, 254, 0.9) 100%),
+                url('../images/dna_bg.png');
+    background-size: cover;
+    background-position: center;
 }
 
 .badge-pill {
@@ -189,6 +227,25 @@ main.main-content { flex: 1; }
     transition: var(--transition);
 }
 .btn-hero-outline:hover { background: rgba(255,255,255,0.08); color: white; }
+
+.btn-admin {
+    padding: 0.75rem 2rem;
+    font-weight: 700;
+    border-radius: 50px;
+    font-size: 1rem;
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    border: none;
+    color: white !important;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-admin:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+    filter: brightness(1.1);
+}
 
 .hero-stats { display: flex; gap: 2rem; align-items: center; }
 .stat-item { text-align: center; }
@@ -438,3 +495,64 @@ main.main-content { flex: 1; }
 .form-control:focus { border-color: var(--primary); background: rgba(255,255,255,0.07); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); color: var(--bs-body-color); }
 [data-bs-theme="light"] .form-control { background: white; border-color: #e2e8f0; }
 .badge { letter-spacing: 0.02em; }
+
+/* --- DNA Team Admin Specific Styles --- */
+.dna-admin-bg {
+    background: linear-gradient(135deg, 
+                rgba(10, 15, 30, 0.95) 0%, 
+                rgba(15, 23, 42, 0.92) 50%, 
+                rgba(20, 10, 30, 0.95) 100%), 
+                url('../images/dna_bg.png') !important;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-position: center !important;
+}
+
+.dna-helix-bg {
+    position: fixed;
+    top: 0; right: -100px;
+    width: 400px; height: 100%;
+    background: url('../images/dna_bg.png');
+    background-size: contain;
+    background-repeat: repeat-y;
+    opacity: 0.05;
+    z-index: -1;
+    animation: helixFlow 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes helixFlow {
+    from { background-position: 0 0; }
+    to { background-position: 0 1000px; }
+}
+
+.admin-header-badge {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--warning);
+    border-radius: 50px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.dna-team-admin-card {
+    border-left: 4px solid var(--warning);
+}
+
+.admin-login-container {
+    max-width: 450px;
+    margin: 5rem auto;
+}
+
+.admin-brand-icon {
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.5));
+    animation: rotateDNA 20s linear infinite;
+}
+
+@keyframes rotateDNA {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

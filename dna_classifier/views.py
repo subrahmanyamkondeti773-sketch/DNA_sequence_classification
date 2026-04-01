@@ -21,6 +21,64 @@ from .ai_helper import get_ai_explanation, get_ai_suggestions
 logger = logging.getLogger(__name__)
 
 
+@login_required
+def model_accuracy_view(request):
+    """Run model accuracy check and display report."""
+    predictor = get_predictor()
+    
+    # Test sequences with known labels (same as in verify_accuracy.py)
+    test_data = [
+        ("ATGTTTTGCCAACTGGCCAAGACCTGCCCTGTGCAGCTGTGGGTTGATTCCACACCCCCGCCCGGCACCCGCGTCCGCGCCATGGCCATCTACAAGCAGTCACAGCACATGACGGAGGTTGTGAGGCGCTGCCCCCACCATGAGCGCTGCTCAGATAGCGATGGTCTGGCCCCTCCTCAGCATCTTATCCGAGTGGAAGGAAATTTGCGTGTGGAGTATTTGGATGACAGAAACACTTTTCGACATAGTGTGGTGGTGCCCTATGAGCCGCCTGAGGTTGGCTCTGACTGTACCACCATCCACTACAACTACATGTGTAACAGTTCCTGCATGGGCGGCATGAACCGGAGGCCCATCCTCACCATCATCACACTGGAAGACTCCAGTGGTAATCTACTGGGACGGAACAGCTTTGAGGTGCGTGTTTGTGCCTGTCCTGGGAGAGACCGGCGCACAGAGGAAGAGAATCTCCGCAAGAAAGGGGAGCCTCACCACGAGCTGCCCCCAGGGAGCACTAAGCGAGCACTGCCCAACAACACCAGCTCCTCTCCCCAGCCAAAGAAGAAACCACTGGATGGAGAATATTTCACCCTTCAGATCCGTGGGCGTGAGCGCTTCGAGATGTTCCGAGAGCTGAATGAGGCCTTGGAACTCAAGCCGTACTCCCCGGACGAT", "human"),
+        ("ATGCAGCAGCCCCGGCAGCAGCAGCAGCAGCAAAGCAAGATCAGCAGCAACAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG", "chimpanzee"),
+        ("ATGGGAATCCCAGAAGGAAAGTCAGCTTGCAAATGGAATGGATTTCCAGCAGTAGCAGCCCAGCCCCCGGAGCCACAGCCCCCAGCCCCAGCCCCAGCACCCAGCACCCGGCCGCAGCACCCGGAGAGCAGCAGAGCCCAGCAAGGCAGCAGCAGCAGCAGCAGATCAAGAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAGCAG", "dog"),
+    ]
+    
+    results = []
+    correct = 0
+    total = len(test_data)
+    
+    for seq, expected in test_data:
+        try:
+            # Clean and validate (simple version)
+            prepared_seq = seq.upper().replace(' ', '').replace('\n', '')
+            result = predictor.predict(prepared_seq)
+            predicted = result['label']
+            confidence = result['confidence']
+            
+            is_correct = predicted.lower() == expected.lower()
+            if is_correct:
+                correct += 1
+            
+            results.append({
+                'expected': expected,
+                'predicted': predicted,
+                'confidence': confidence,
+                'is_correct': is_correct,
+                'status': "PASS" if is_correct else "FAIL"
+            })
+        except Exception as e:
+            logger.error(f"Error checking accuracy for {expected}: {e}")
+            results.append({
+                'expected': expected,
+                'predicted': "ERROR",
+                'confidence': 0,
+                'is_correct': False,
+                'status': f"ERROR: {str(e)}"
+            })
+
+    accuracy = (correct / total) * 100 if total > 0 else 0
+    
+    context = {
+        'results': results,
+        'total': total,
+        'correct': correct,
+        'accuracy': round(accuracy, 1),
+        'title': 'Model Accuracy Report',
+        'report_date': timezone.now()
+    }
+    return render(request, 'accuracy_report.html', context)
+
+
 def home_view(request):
     """Landing page with project overview."""
     stats = {
