@@ -56,8 +56,8 @@
     </div>
 
     <div class="row g-4">
-        <!-- Left Column -->
-        <div class="col-lg-7">
+        <!-- Results Column -->
+        <div class="col-lg-10 mx-auto">
 
             <!-- Sequence Stats -->
             <div class="glass-card p-4 mb-4">
@@ -124,39 +124,6 @@
             </div>
         </div>
 
-        <!-- Right Column - AI Content -->
-        <div class="col-lg-5">
-
-            <!-- AI Explanation -->
-            <div class="glass-card p-4 mb-4 ai-card">
-                <div class="ai-header mb-3">
-                    <i class="bi bi-stars text-warning me-2"></i>
-                    <span class="ai-badge">Explanation</span>
-                </div>
-                <div class="ai-content markdown-content">
-                    {% if record.ai_explanation %}
-                        {{ record.ai_explanation|linebreaks }}
-                    {% else %}
-                        <p class="text-muted">AI explanation not available for this record.</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- AI Suggestions -->
-            <div class="glass-card p-4 ai-card ai-suggestions-card">
-                <div class="ai-header mb-3">
-                    <i class="bi bi-lightbulb text-info me-2"></i>
-                    <span class="ai-badge suggestions">Research Suggestions</span>
-                </div>
-                <div class="ai-content markdown-content">
-                    {% if record.ai_suggestions %}
-                        {{ record.ai_suggestions|linebreaks }}
-                    {% else %}
-                        <p class="text-muted">AI suggestions not available for this record.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 {% endblock %}

@@ -22,13 +22,13 @@
                     <span class="pulse-dot"></span>
                 </div>
                 <h1 class="hero-title">
-                     DNA Sequences classification using machine learning<br>
+                    DNA Sequences classification using machine learning<br>
                     <span class="gradient-text"> </span><br>
-                   
+
                 </h1>
                 <p class="hero-subtitle">
                     Upload any DNA sequence and get instant classification using trained machine learning models,
-                    
+
                 <div class="d-flex flex-wrap gap-3 mt-4">
                     {% if user.is_authenticated %}
                     <a href="{% url 'dna_input' %}" class="btn btn-primary btn-hero">
@@ -37,7 +37,8 @@
                     <a href="{% url 'dashboard' %}" class="btn btn-outline-light btn-hero-outline">
                         <i class="bi bi-speedometer2 me-2"></i>Dashboard
                     </a>
-                    <a href="{% url 'model_accuracy' %}" class="btn btn-warning btn-hero" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: white;">
+                    <a href="{% url 'model_accuracy' %}" class="btn btn-warning btn-hero"
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: white;">
                         <i class="bi bi-cpu me-2"></i>Check Accuracy (Train)
                     </a>
                     {% if user.is_staff %}
@@ -72,9 +73,9 @@
             </div>
 
             <!-- DNA Visualization Card -->
-       
-            </div>
+
         </div>
+    </div>
     </div>
 </section>
 
@@ -90,42 +91,41 @@
                 <div class="feature-card glass-card h-100">
                     <div class="feature-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🧬</div>
                     <h3 class="feature-title">ML Classification</h3>
-                    <p class="feature-desc">Advanced machine learning models trained on genomic datasets classify your DNA sequences instantly with high accuracy.</p>
+                    <p class="feature-desc">Advanced machine learning models trained on genomic datasets classify your
+                        DNA sequences instantly with high accuracy.</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="feature-card glass-card h-100">
-                    <div class="feature-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">🤖</div>
-                    <h3 class="feature-title">AI Explanation</h3>
-                    <p class="feature-desc">GPT-4o powered explanations provide biological context, gene type identification, and health relevance for every classification.</p>
-                </div>
-            </div>
+
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card glass-card h-100">
                     <div class="feature-icon" style="background: linear-gradient(135deg, #22c55e, #15803d);">📊</div>
                     <h3 class="feature-title">Analytics Dashboard</h3>
-                    <p class="feature-desc">Interactive Chart.js visualizations showing your classification history, class distribution, and activity trends.</p>
+                    <p class="feature-desc">Interactive Chart.js visualizations showing your classification history,
+                        class distribution, and activity trends.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card glass-card h-100">
                     <div class="feature-icon" style="background: linear-gradient(135deg, #f59e0b, #b45309);">🔬</div>
                     <h3 class="feature-title">Sequence Visualization</h3>
-                    <p class="feature-desc">Color-coded base display (A/T/G/C) with GC content analysis and sequence statistics for each prediction.</p>
+                    <p class="feature-desc">Color-coded base display (A/T/G/C) with GC content analysis and sequence
+                        statistics for each prediction.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card glass-card h-100">
                     <div class="feature-icon" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">📄</div>
                     <h3 class="feature-title">PDF Export</h3>
-                    <p class="feature-desc">Download complete analysis reports as professional PDF documents including sequence data, classification, and AI insights.</p>
+                    <p class="feature-desc">Download complete analysis reports as professional PDF documents including
+                        sequence data, classification, and AI insights.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4">
                 <div class="feature-card glass-card h-100">
                     <div class="feature-icon" style="background: linear-gradient(135deg, #06b6d4, #0e7490);">🏥</div>
                     <h3 class="feature-title">Research History</h3>
-                    <p class="feature-desc">Full searchable history of all your classifications with pagination, filters, and detailed view for each prediction.</p>
+                    <p class="feature-desc">Full searchable history of all your classifications with pagination,
+                        filters, and detailed view for each prediction.</p>
                 </div>
             </div>
         </div>

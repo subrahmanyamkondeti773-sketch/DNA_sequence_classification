@@ -36,6 +36,8 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto align-items-lg-center gap-1">
+                <!-- Standard links hidden on Admin Dashboard -->
+                {% if request.resolver_match.url_name != 'admin_dashboard' %}
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
                         <i class="bi bi-house-fill me-1"></i>Home
@@ -57,9 +59,22 @@
                         <i class="bi bi-clock-history me-1"></i>History
                     </a>
                 </li>
+                {% endif %}
+                {% endif %}
+                {% if user.is_authenticated %}
                 {% if user.is_staff %}
                 <li class="nav-item">
-                    <a class="nav-link text-warning" href="{% url 'admin_dashboard' %}">
+                    <a class="nav-link text-info" href="{% url 'admin_dashboard' %}#user-details-section">
+                        <i class="bi bi-people me-1"></i>User Details
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning" href="{% url 'admin_dashboard' %}#prediction-history-section">
+                        <i class="bi bi-clock-history me-1"></i>Global History
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-bold" href="{% url 'admin_dashboard' %}">
                         <i class="bi bi-shield-check me-1"></i>Admin
                     </a>
                 </li>
@@ -80,7 +95,7 @@
                     <a class="nav-link" href="{% url 'login' %}"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/admin/"><i class="bi bi-shield-lock me-1"></i>Admin</a>
+                    <a class="nav-link" href="{% url 'login' %}"><i class="bi bi-shield-lock me-1"></i>Admin</a>
                 </li>
                 <li class="nav-item">
                     <a class="btn btn-primary btn-sm px-3" href="{% url 'register' %}">Get Started</a>

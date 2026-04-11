@@ -81,6 +81,10 @@ def model_accuracy_view(request):
 
 def home_view(request):
     """Landing page with project overview."""
+    if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin_dashboard')
+        return redirect('dashboard')
     stats = {
         'total_predictions': DNASequence.objects.count(),
         'total_users': User.objects.count(),
@@ -94,6 +98,9 @@ def home_view(request):
 @login_required
 def dashboard_view(request):
     """User dashboard with stats and recent predictions."""
+    if request.user.is_staff:
+        return redirect('admin_dashboard')
+        
     user_predictions = DNASequence.objects.filter(user=request.user)
 
     # Stats
@@ -149,9 +156,9 @@ def dna_input_view(request):
             predictor = get_predictor()
             result = predictor.predict(cleaned)
 
-            # Get AI explanation & suggestions
-            ai_explanation = get_ai_explanation(cleaned, result['label'])
-            ai_suggestions = get_ai_suggestions(cleaned, result['label'])
+            # AI generation disabled as requested
+            ai_explanation = ""
+            ai_suggestions = ""
 
             # Save to database
             dna_record = DNASequence.objects.create(
@@ -289,11 +296,6 @@ def export_pdf_view(request, pk):
     story.append(Paragraph(f'<font name="Courier" size="8">{seq_display}</font>', styles['Normal']))
     story.append(Spacer(1, 0.2*inch))
 
-    # AI Explanation (strip markdown for PDF)
-    if record.ai_explanation:
-        story.append(Paragraph("AI Explanation", styles['Heading2']))
-        clean_explanation = record.ai_explanation.replace('**', '').replace('##', '').replace('*', '')
-        story.append(Paragraph(clean_explanation[:1500], styles['Normal']))
 
     doc.build(story)
     buffer.seek(0)
@@ -337,7 +339,9 @@ def admin_dashboard_view(request):
     today_predictions = DNASequence.objects.filter(
         created_at__date=timezone.now().date()
     ).count()
-    api_logs = APILog.objects.all()[:20]
+    
+    # We remove api_logs as requested by user
+    # api_logs = APILog.objects.all()[:20]
 
     class_dist = list(
         DNASequence.objects.values('prediction').annotate(count=Count('id')).order_by('-count')
@@ -349,16 +353,28 @@ def admin_dashboard_view(request):
         created_at__gte=week_ago
     ).values('user').distinct().count()
 
-    recent_predictions = DNASequence.objects.select_related('user').order_by('-created_at')[:15]
+    # Increase limit for the new Global History section
+    recent_predictions = DNASequence.objects.select_related('user').order_by('-created_at')[:20]
+
+    # All users with prediction counts and profiles (select_related for team_name)
+    all_users = User.objects.select_related('profile').annotate(
+        prediction_count=Count('dnasequence_set')
+    ).order_by('-date_joined')
+    
+    for u in all_users:
+        if total_predictions > 0:
+            u.prediction_percent = min(100, (u.prediction_count / total_predictions) * 100)
+        else:
+            u.prediction_percent = 0
 
     context = {
         'total_users': total_users,
         'total_predictions': total_predictions,
         'today_predictions': today_predictions,
         'active_users': active_users,
-        'api_logs': api_logs,
         'class_dist': json.dumps(class_dist),
         'recent_predictions': recent_predictions,
+        'all_users': all_users,
         'title': 'Admin Analytics Dashboard',
     }
     return render(request, 'admin_dashboard.html', context)

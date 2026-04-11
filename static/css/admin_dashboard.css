@@ -1,0 +1,193 @@
+/* ============================================
+   DNA Admin Dashboard - Premium Design
+   ============================================ */
+
+:root {
+    --admin-header-height: 80px;
+    --admin-card-glass: rgba(30, 41, 59, 0.7);
+    --admin-card-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Layout */
+.admin-wrapper {
+    display: block; /* Changed from flex */
+    min-height: 100vh;
+    background: #020617;
+    color: #f1f5f9;
+}
+
+/* Sidebar Removed */
+
+/* Main Content Area */
+.admin-main {
+    flex: 1;
+    margin-left: 0; /* Sidebar space removed */
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-header {
+    height: var(--admin-header-height);
+    padding: 0 2rem;
+    background: rgba(2, 6, 23, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--admin-card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+.admin-breadcrumb {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--admin-card-border);
+}
+
+.profile-info {
+    text-align: right;
+}
+
+.profile-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.profile-role {
+    font-size: 0.75rem;
+    color: var(--admin-sidebar-text);
+}
+
+.admin-content {
+    padding: 2rem;
+}
+
+/* Dashboard Cards */
+.dash-card {
+    background: var(--admin-card-glass);
+    border: 1px solid var(--admin-card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.dash-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.dash-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.dash-card-value {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+
+.dash-card-label {
+    font-size: 0.875rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Premium Gradients */
+.grad-blue { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.grad-green { background: linear-gradient(135deg, #10b981, #059669); }
+.grad-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+.grad-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+/* Tables */
+.admin-table-container {
+    background: var(--admin-card-glass);
+    border: 1px solid var(--admin-card-border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    border-bottom: 1px solid var(--admin-card-border);
+}
+
+.admin-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--admin-card-border);
+    vertical-align: middle;
+}
+
+.admin-table tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tr:hover {
+    background: rgba(255, 255, 255, 0.01);
+}
+
+/* Confidence Bar */
+.conf-bar-wrapper {
+    width: 100px;
+}
+
+.conf-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.conf-fill {
+    height: 100%;
+    border-radius: 10px;
+}
+
+/* Alerts */
+.badge-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.status-error { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.status-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .admin-main {
+        margin-left: 0;
+    }
+}

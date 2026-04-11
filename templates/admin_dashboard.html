@@ -1,128 +1,239 @@
 {% extends 'base.html' %}
-{% block body_class %}dna-admin-bg{% endblock %}
-{% block title %}Admin Analytics | DNA Classification System{% endblock %}
+{% load static %}
+
+{% block title %}Premium Admin Analytics | DNA Team{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block body_class %}admin-layout{% endblock %}
 
 {% block content %}
-<div class="dna-helix-bg"></div>
-<div class="container-xl py-5">
-    <div class="d-flex align-items-center gap-3 mb-5">
-        <div class="admin-brand-icon">🧬</div>
-        <div>
-            <div class="admin-header-badge mb-1">DNA Team System</div>
-            <h1 class="page-title">Administrative <span class="gradient-text">Analytics Dashboard</span></h1>
-            <p class="text-muted">Global monitoring and DNA sequence classification analytics</p>
-        </div>
-        <a href="{% url 'admin:index' %}" class="btn btn-admin ms-auto">
-            <i class="bi bi-gear-fill"></i> DNA Management
-        </a>
-    </div>
+<div class="admin-wrapper">
+    <!-- Main Content -->
+    <main class="admin-main">
+        <header class="admin-header">
+            <div class="admin-breadcrumb">
+                Pages / <span class="text-white fw-medium">Analytics Dashboard</span>
+            </div>
 
-    <!-- System Stats -->
-    <div class="row g-4 mb-5">
-        <div class="col-sm-6 col-xl-3">
-            <div class="stat-card glass-card h-100">
-                <div class="stat-card-icon" style="background:linear-gradient(135deg,#3b82f6,#1d4ed8)">
-                    <i class="bi bi-people"></i>
+            <div class="admin-profile">
+                <div class="profile-info">
+                    <div class="profile-name">{{ user.username }}</div>
+                    <div class="profile-role">System Administrator</div>
                 </div>
-                <div class="stat-card-value">{{ total_users }}</div>
-                <div class="stat-card-label">Total Users</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="stat-card glass-card h-100">
-                <div class="stat-card-icon" style="background:linear-gradient(135deg,#22c55e,#15803d)">
-                    <i class="bi bi-search"></i>
+                <div class="avatar-sm">
+                    {{ user.username|first|upper }}
                 </div>
-                <div class="stat-card-value">{{ total_predictions }}</div>
-                <div class="stat-card-label">Total Predictions</div>
             </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="stat-card glass-card h-100">
-                <div class="stat-card-icon" style="background:linear-gradient(135deg,#f59e0b,#b45309)">
-                    <i class="bi bi-calendar-day"></i>
-                </div>
-                <div class="stat-card-value">{{ today_predictions }}</div>
-                <div class="stat-card-label">Today's Predictions</div>
-            </div>
-        </div>
-        <div class="col-sm-6 col-xl-3">
-            <div class="stat-card glass-card h-100">
-                <div class="stat-card-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">
-                    <i class="bi bi-person-check"></i>
-                </div>
-                <div class="stat-card-value">{{ active_users }}</div>
-                <div class="stat-card-label">Active Users (7d)</div>
-            </div>
-        </div>
-    </div>
+        </header>
 
-    <div class="row g-4 mb-5">
-        <!-- Class Distribution Chart -->
-        <div class="col-lg-5">
-            <div class="glass-card p-4 h-100">
-                <h3 class="chart-title mb-4"><i class="bi bi-pie-chart me-2 text-primary"></i>Global Class Distribution</h3>
-                <div class="chart-container">
-                    <canvas id="adminPieChart"></canvas>
+        <section class="admin-content">
+            <!-- Stat Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="dash-card">
+                        <div class="dash-card-icon grad-blue">
+                            <i class="bi bi-people-fill"></i>
+                        </div>
+                        <div class="dash-card-value">{{ total_users }}</div>
+                        <div class="dash-card-label">Registered Personnel</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="dash-card">
+                        <div class="dash-card-icon grad-green">
+                            <i class="bi bi-search-heart-fill"></i>
+                        </div>
+                        <div class="dash-card-value">{{ total_predictions }}</div>
+                        <div class="dash-card-label">Total Sequences Processed</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="dash-card">
+                        <div class="dash-card-icon grad-purple">
+                            <i class="bi bi-activity"></i>
+                        </div>
+                        <div class="dash-card-value">{{ today_predictions }}</div>
+                        <div class="dash-card-label">Analysed (Last 24h)</div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="dash-card">
+                        <div class="dash-card-icon grad-orange">
+                            <i class="bi bi-person-badge-fill"></i>
+                        </div>
+                        <div class="dash-card-value">{{ active_users }}</div>
+                        <div class="dash-card-label">Active Users (7d Window)</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Recent Predictions Table -->
-        <div class="col-lg-7">
-            <div class="glass-card p-4 h-100">
-                <h3 class="chart-title mb-4"><i class="bi bi-list-check me-2 text-success"></i>Recent Predictions</h3>
+            <div class="row g-4 mb-5">
+                <!-- Chart -->
+                <div class="col-lg-5">
+                    <div class="admin-table-container p-4 h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h5 class="m-0"><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Global Class Distribution</h5>
+                        </div>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="adminPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Table -->
+                <div class="col-lg-7">
+                    <div class="admin-table-container p-4 h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <h5 class="m-0"><i class="bi bi-list-stars me-2 text-success"></i>Recent High-Confidence Personnel Hits</h5>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Research Personnel</th>
+                                        <th>Target Identification</th>
+                                        <th>Confidence Index</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pred in recent_predictions %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="avatar-sm" style="width: 24px; height: 24px; font-size: 0.6rem;">{{ pred.user.username|first|upper }}</div>
+                                                <span class="fw-medium">{{ pred.user.username }}</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge prediction-badge">{{ pred.prediction }}</span></td>
+                                        <td>
+                                            <div class="conf-bar-wrapper">
+                                                <div class="d-flex justify-content-between mb-1" style="font-size: 0.7rem;">
+                                                    <span class="text-{{ pred.confidence_color }}">{{ pred.confidence_percent }}</span>
+                                                </div>
+                                                <div class="conf-bar">
+                                                    <div class="conf-fill bg-{{ pred.confidence_color }}" style="width: {{ pred.confidence_percent }}"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-muted small">{{ pred.created_at|date:"M d, H:i" }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- All Users Details -->
+            <div class="admin-table-container p-4 mb-5" id="user-details-section">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="m-0"><i class="bi bi-people-fill me-2 text-info"></i>User Details & Research Teams</h5>
+                    <span class="badge bg-info text-dark px-3 mt-n1">{{ all_users|length }} Users Total</span>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-sm glass-table align-middle">
+                    <table class="admin-table">
                         <thead>
-                            <tr><th>User</th><th>Prediction</th><th>Confidence</th><th>Date</th></tr>
+                            <tr>
+                                <th>Personnel</th>
+                                <th>Contact Identifier (Email)</th>
+                                <th>Research Team</th>
+                                <th>Onboarding Date</th>
+                                <th>System Status</th>
+                                <th>Auth Level</th>
+                                <th>Analyses Tasked</th>
+                            </tr>
                         </thead>
                         <tbody>
-                            {% for pred in recent_predictions %}
+                            {% for user in all_users %}
                             <tr>
-                                <td><span class="fw-semibold">{{ pred.user.username }}</span></td>
-                                <td><span class="badge prediction-badge">{{ pred.prediction }}</span></td>
-                                <td><small class="text-{{ pred.confidence_color }}">{{ pred.confidence_percent }}</small></td>
-                                <td><small class="text-muted">{{ pred.created_at|date:"M d H:i" }}</small></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm" style="width: 28px; height: 28px; font-size: 0.8rem;">{{ user.username|first|upper }}</div>
+                                        <div>
+                                            <div class="fw-bold">{{ user.username }}</div>
+                                            <div class="text-muted small">ID: #{{ user.id|stringformat:"04d" }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-muted">{{ user.email|default:"N/A" }}</td>
+                                <td><span class="text-info fw-medium">{{ user.profile.team_name|default:"Independent" }}</span></td>
+                                <td class="text-muted small">{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if user.is_active %}
+                                    <span class="badge-status status-success">ACTIVE</span>
+                                    {% else %}
+                                    <span class="badge-status status-error">INACTIVE</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_superuser %}
+                                    <span class="badge bg-danger text-white px-2 py-1" style="font-size: 0.65rem;">ROOT</span>
+                                    {% elif user.is_staff %}
+                                    <span class="badge bg-warning text-dark px-2 py-1" style="font-size: 0.65rem;">STAFF</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary text-white px-2 py-1" style="font-size: 0.65rem;">RESEARCHER</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="fw-bold">{{ user.prediction_count }}</div>
+                                        <div class="conf-bar" style="width: 50px;">
+                                            <div class="conf-fill bg-info" style="width: {{ user.prediction_percent }}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- API Logs -->
-    <div class="glass-card p-4">
-        <h3 class="chart-title mb-4"><i class="bi bi-terminal me-2 text-warning"></i>API Logs</h3>
-        {% if api_logs %}
-        <div class="table-responsive">
-            <table class="table table-sm glass-table align-middle">
-                <thead>
-                    <tr><th>Endpoint</th><th>Status</th><th>Response Time</th><th>Date</th><th>Error</th></tr>
-                </thead>
-                <tbody>
-                    {% for log in api_logs %}
-                    <tr>
-                        <td><code>{{ log.endpoint }}</code></td>
-                        <td>
-                            <span class="badge bg-{% if log.status == 'success' %}success{% elif log.status == 'error' %}danger{% else %}warning{% endif %}">
-                                {{ log.status }}
-                            </span>
-                        </td>
-                        <td><small>{{ log.response_time|floatformat:2 }}s</small></td>
-                        <td><small class="text-muted">{{ log.created_at|date:"M d H:i" }}</small></td>
-                        <td><small class="text-danger">{{ log.error_message|truncatechars:40 }}</small></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <p class="text-muted text-center py-3">No API logs yet.</p>
-        {% endif %}
-    </div>
+            <!-- Detailed Prediction History -->
+            <div class="admin-table-container p-4" id="prediction-history-section">
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h5 class="m-0"><i class="bi bi-clock-history me-2 text-warning"></i>Global Prediction History Log</h5>
+                    <span class="badge bg-warning text-dark px-3 mt-n1">Real-time Data</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Sequence Snippet</th>
+                                <th>Research Personnel</th>
+                                <th>Target Identification</th>
+                                <th>Confidence</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pred in recent_predictions %}
+                            <tr>
+                                <td><code class="text-info" style="font-size: 0.75rem;">{{ pred.short_sequence }}</code></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm" style="width: 24px; height: 24px; font-size: 0.6rem;">{{ pred.user.username|first|upper }}</div>
+                                        <span class="fw-medium">{{ pred.user.username }}</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge prediction-badge">{{ pred.prediction }}</span></td>
+                                <td>
+                                    <span class="badge bg-{{ pred.confidence_color }}" style="font-size: 0.65rem;">{{ pred.confidence_percent }}</span>
+                                </td>
+                                <td class="text-muted small">{{ pred.created_at|date:"Y-m-d H:i:s" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
 </div>
 {% endblock %}
 
@@ -137,14 +248,47 @@ if (classDistData.length > 0) {
             labels: classDistData.map(d => d.prediction),
             datasets: [{
                 data: classDistData.map(d => d.count),
-                backgroundColor: ['#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316'],
-                borderWidth: 2,
-                borderColor: 'rgba(255,255,255,0.1)'
+                backgroundColor: [
+                    '#3b82f6', # Blue
+                    '#10b981', # Green
+                    '#8b5cf6', # Purple
+                    '#f59e0b', # Orange
+                    '#ef4444', # Red
+                    '#06b6d4', # Cyan
+                    '#f472b6'  # Pink
+                ],
+                borderWidth: 0,
+                hoverOffset: 15
             }]
         },
         options: {
             responsive: true,
-            plugins: { legend: { labels: { color: '#94a3b8', font: { family: 'Inter' } } } }
+            maintainAspectRatio: false,
+            cutout: '75%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#94a3b8',
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            family: "'Inter', sans-serif",
+                            size: 11
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#1e293b',
+                    titleColor: '#f1f5f9',
+                    bodyColor: '#94a3b8',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    padding: 12,
+                    cornerRadius: 10,
+                    displayColors: true
+                }
+            }
         }
     });
 }

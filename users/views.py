@@ -13,6 +13,8 @@ from .models import UserProfile
 def register_view(request):
     """Handle user registration."""
     if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin_dashboard')
         return redirect('dashboard')
 
     if request.method == 'POST':
@@ -21,6 +23,8 @@ def register_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, f'Welcome to DNA Classification System, {user.username}! 🧬')
+            if user.is_staff:
+                return redirect('admin_dashboard')
             return redirect('dashboard')
         else:
             messages.error(request, 'Please correct the errors below.')
@@ -33,6 +37,8 @@ def register_view(request):
 def login_view(request):
     """Handle user login."""
     if request.user.is_authenticated:
+        if request.user.is_staff:
+            return redirect('admin_dashboard')
         return redirect('dashboard')
 
     if request.method == 'POST':
@@ -44,7 +50,15 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.username}! 🧬')
-                next_url = request.GET.get('next', 'dashboard')
+                
+                # Redirect admin to admin-dashboard, others to dashboard
+                next_url = request.GET.get('next')
+                if not next_url:
+                    if user.is_staff:
+                        next_url = 'admin_dashboard'
+                    else:
+                        next_url = 'dashboard'
+                
                 return redirect(next_url)
         messages.error(request, 'Invalid username or password.')
     else:
